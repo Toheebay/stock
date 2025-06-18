@@ -6,19 +6,23 @@ import Dashboard from "@/components/Dashboard";
 import ProductManagement from "@/components/ProductManagement";
 import CategoryManagement from "@/components/CategoryManagement";
 import StockManagement from "@/components/StockManagement";
+import UserProfile from "@/components/UserProfile";
 import { Package, BarChart3, Tags, Archive } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-6">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">
-            Stock Vista System
-          </h1>
-          <p className="text-slate-600">
-            Complete inventory management solution for your business
-          </p>
+        <header className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">
+              Stock Vista System
+            </h1>
+            <p className="text-slate-600">
+              Complete inventory management solution for your business
+            </p>
+          </div>
+          <UserProfile />
         </header>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
