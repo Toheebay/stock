@@ -18,7 +18,7 @@ const Index = () => {
             <h1 className="text-4xl font-bold text-slate-800 mb-2">
               Stock Vista System
             </h1>
-            <p className="text-slate-600">
+            <p className="text-slate-400">
               Complete inventory management solution for your business
             </p>
           </div>
