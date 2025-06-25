@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // main.tsx
 import './index.css'; // ✅ Tailwind directives (must be first)
 import React from "react";
@@ -15,3 +16,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </AuthProvider>
   </React.StrictMode>
 );
+=======
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+createRoot(document.getElementById("root")!).render(<App />);
+>>>>>>> 17a19d8 (Initial commit)

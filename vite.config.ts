@@ -1,34 +1,36 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc"; // using the SWC version for faster builds
 import tsconfigPaths from "vite-tsconfig-paths";
-
+import path from "path";
+import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "::", // enable IPv6
+    port: 8080,
+    open: true
+  },
   plugins: [
     react(),
-    tsconfigPaths() // Enables support for path aliases like @/components
-  ],
+    tsconfigPaths(), // supports tsconfig path aliases
+    mode === "development" && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
-      // fallback in case tsconfigPaths plugin misses anything
-      "@": "/src"
+      "@": path.resolve(__dirname, "./src") // ensures '@' points to 'src'
     }
   },
   css: {
     preprocessorOptions: {
       scss: {
-        // Add global SCSS variables/mixins if needed
+        // Example: add global styles if needed
         // additionalData: `@import "@/styles/variables.scss";`
       }
     }
-  },
-  server: {
-    port: 5173,
-    open: true
   },
   build: {
     outDir: "dist",
     sourcemap: true
   }
-});
+}));
