@@ -1,39 +1,45 @@
-// App.jsx
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom"; // ✅ remove BrowserRouter
-import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./components/DashboardLayout";
 
-const queryClient = new QueryClient();
+import Dashboard from "./pages/Dashboard";
+import CategoryManagement from "./components/CategoryManagement";
+import ProductsManagement from "./components/ProductManagement";
+import StockManagement from "./components/StockManagement";
+import UserProfile from "./components/UserProfile";
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        {/* ✅ No more BrowserRouter here */}
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            } 
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<Auth />} />
+      <Route path="/login" element={<Auth />} />
+      <Route path="/register" element={<Auth />} />
+
+      {/* Protected Dashboard Layout with Nested Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="categories" element={<CategoryManagement />} />
+        <Route path="products" element={<ProductsManagement />} />
+        <Route path="stocks" element={<StockManagement />} />
+        <Route path="profile" element={<UserProfile />} />
+      </Route>
+
+      {/* Fallback Route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 export default App;

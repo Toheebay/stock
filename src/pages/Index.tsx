@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/pages/Dashboard";
 import ProductManagement from "@/components/ProductManagement";
 import CategoryManagement from "@/components/CategoryManagement";
 import StockManagement from "@/components/StockManagement";

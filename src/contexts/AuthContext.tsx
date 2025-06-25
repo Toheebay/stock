@@ -1,21 +1,24 @@
-// src/contexts/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import axios from "axios";
 
-// Define the shape of the user
 interface User {
   _id: string;
   email: string;
   fullName: string;
 }
 
-// Define the shape of the AuthContext
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ user?: User; error?: any }>;
+  signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string, fullName: string) => Promise<any>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,47 +28,60 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
-    setLoading(false);
+      try {
+        const res = await axios.get("https://stock-2-nzro.onrender.com/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(res.data.user);
+      } catch (err) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
   }, []);
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { token, user } = await axios
-        .post("https://stock-2-nzro.onrender.com/api/auth/login", { email, password })
-        .then((res) => res.data);
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-
-      return { user };
-    } catch (error: any) {
-      return { error };
-    }
-  };
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
-        fullName,
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "https://stock-2-nzro.onrender.com/api/auth/register",
+        { email, password, fullName }
+      );
       return res.data;
     } catch (error: any) {
-      return { error };
+      return { error: error.response?.data || "Signup failed" };
     }
   };
 
-  const signOut = () => {
+  const signIn = async (email: string, password: string) => {
+    try {
+      const res = await axios.post(
+        "https://stock-2-nzro.onrender.com/api/auth/login",
+        { email, password }
+      );
+
+      const { user, token } = res.data;
+      setUser(user);
+      localStorage.setItem("token", token);
+      return res.data;
+    } catch (error: any) {
+      return { error: error.response?.data || "Login failed" };
+    }
+  };
+
+  const signOut = async () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setUser(null);
   };
 
@@ -76,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;

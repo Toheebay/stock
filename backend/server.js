@@ -1,46 +1,60 @@
-// server.js or index.js
+// server.js
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import authRoutes from "./routes/authRoutes.js";
-import itemRoutes from "./routes/itemRoutes.js"; // ⬅️ Import new routes
+import itemRoutes from "./routes/itemRoutes.js";
+import Item from "./models/Item.js"; // Make sure this file exists and exports the model
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 5000;
+
+// ✅ Middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "https://your-frontend-domain.com"],
+  credentials: true,
+}));
 app.use(express.json());
 
-
-
-
-// ✅ Root
-
-
-import Item from "./models/Item.js"; // Make sure this path is correct
-
-app.get("/test-db", async (req, res) => {
-  try {
-    const items = await Item.find(); // test a DB operation
-    res.json({ success: true, count: items.length });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
+// ✅ Root route
 app.get("/", (req, res) => {
   res.send("🚀 Welcome to the API!");
 });
 
+// ✅ Test DB route
+app.post("/test-add", async (req, res) => {
+  try {
+    const newItem = await Item.create({
+      name: "Laptopi",
+      quantity: 1000,
+      price: 799,
+    });
+    res.status(201).json({ success: true, item: newItem });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
 // ✅ Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/items", itemRoutes); // ⬅️ Mount the item routes
+app.use("/api/items", itemRoutes);
 
-// ✅ Connect MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(5000, () => console.log("✅ Server running on port 5000"));
-  })
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// ✅ MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("✅ Connected to MongoDB");
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+})
+.catch((err) => {
+  console.error("❌ Failed to connect to MongoDB:", err.message);
+});
