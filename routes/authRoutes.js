@@ -1,10 +1,17 @@
+// routes/auth.js
+
 import express from "express";
-import { register, login } from "../controllers/authController.js";
 
 const router = express.Router();
 
-// ✅ Use one route only
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", (req, res) => {
+  // handle registration
+  res.send("Register endpoint");
+});
+
+router.post("/login", (req, res) => {
+  // handle login
+  res.send("Login endpoint");
+});
 
 export default router;
